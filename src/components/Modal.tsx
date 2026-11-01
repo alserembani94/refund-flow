@@ -1,4 +1,11 @@
-import { useEffect, useId, useRef, type KeyboardEvent, type ReactNode, type SyntheticEvent } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  type KeyboardEvent,
+  type ReactNode,
+  type SyntheticEvent,
+} from "react";
 import { createPortal } from "react-dom";
 
 type ModalProps = {
@@ -8,18 +15,12 @@ type ModalProps = {
   children: ReactNode;
   footer?: ReactNode;
   size?: "sm" | "lg";
-  /** When false, Escape and the close button do nothing (e.g. while a request is in flight). */
   dismissible?: boolean;
   role?: "dialog" | "alertdialog";
 };
 
 const SIZES = { sm: "max-w-md", lg: "max-w-2xl" };
 
-/**
- * A native modal <dialog> portalled to <body>. The browser handles the top layer,
- * focus trapping and inert background, so modals opened from inside other modals
- * stack correctly. Mount to open, unmount to close.
- */
 export function Modal({
   title,
   description,
@@ -44,13 +45,11 @@ export function Modal({
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDialogElement>) => {
     if (event.key !== "Escape") return;
-    // React events bubble through portals, so stop here or a nested dialog's Escape would also close its parent.
     event.preventDefault();
     event.stopPropagation();
     if (dismissible) onClose();
   };
 
-  // Other close requests (e.g. Android back). Keep React in charge of open state.
   const handleCancel = (event: SyntheticEvent<HTMLDialogElement>) => {
     event.preventDefault();
     if (event.target === event.currentTarget && dismissible) onClose();
@@ -84,13 +83,22 @@ export function Modal({
           aria-label="Close"
           className="-mr-2 rounded-md p-1.5 text-slate-400 enabled:hover:bg-slate-100 enabled:hover:text-slate-700 disabled:opacity-40"
         >
-          <svg viewBox="0 0 20 20" fill="currentColor" className="size-5" aria-hidden="true">
+          <svg
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="size-5"
+            aria-hidden="true"
+          >
             <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
           </svg>
         </button>
       </header>
       <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">{children}</div>
-      {footer && <footer className="border-t border-slate-200 bg-slate-50 px-6 py-4">{footer}</footer>}
+      {footer && (
+        <footer className="border-t border-slate-200 bg-slate-50 px-6 py-4">
+          {footer}
+        </footer>
+      )}
     </dialog>,
     document.body,
   );

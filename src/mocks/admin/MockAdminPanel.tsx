@@ -38,7 +38,6 @@ const LATENCY_OPTIONS: Option<MockLatency>[] = [
   { value: "slow", label: "Slow" },
 ];
 
-/** Floating entry point to the panel. Rendered in its own React root, separate from the app. */
 export function MockAdmin() {
   const [isOpen, setIsOpen] = useState(false);
   return (
@@ -55,9 +54,16 @@ function MockApiButton({ onClick }: { onClick: () => void }) {
   const notes = describeMockSettings(useMockSettings());
   return (
     <Button onClick={onClick}>
-      <span className={`size-2 rounded-full ${notes.length ? "bg-amber-500" : "bg-emerald-500"}`} aria-hidden="true" />
+      <span
+        className={`size-2 rounded-full ${notes.length ? "bg-amber-500" : "bg-emerald-500"}`}
+        aria-hidden="true"
+      />
       Mock API
-      {notes.length > 0 && <span className="font-normal text-slate-500">· {notes.join(" · ")}</span>}
+      {notes.length > 0 && (
+        <span className="font-normal text-slate-500">
+          · {notes.join(" · ")}
+        </span>
+      )}
     </Button>
   );
 }
@@ -74,7 +80,10 @@ function MockAdminPanel({ onClose }: { onClose: () => void }) {
       footer={
         <div className="flex justify-between gap-2">
           <Button onClick={resetMockSettings}>Reset settings</Button>
-          <Button onClick={() => window.location.reload()} title="Reloads the page with fresh seed data">
+          <Button
+            onClick={() => window.location.reload()}
+            title="Reloads the page with fresh seed data"
+          >
             Reset order data
           </Button>
         </div>
@@ -90,26 +99,37 @@ function MockAdminPanel({ onClose }: { onClose: () => void }) {
             options={LATENCY_OPTIONS}
             onChange={(latency) => updateMockSettings({ latency })}
           />
-          <p className="mt-1 text-xs text-slate-500">{LATENCY_MS[settings.latency]} ms per request</p>
+          <p className="mt-1 text-xs text-slate-500">
+            {LATENCY_MS[settings.latency]} ms per request
+          </p>
         </fieldset>
 
         <fieldset>
           <legend className="mb-2 text-sm font-medium">Responses</legend>
           <div className="space-y-2">
             {ENDPOINTS.map((endpoint) => (
-              <div key={endpoint.key} className="flex flex-wrap items-center justify-between gap-2">
-                <span className="font-mono text-xs text-slate-600">{endpoint.label}</span>
+              <div
+                key={endpoint.key}
+                className="flex flex-wrap items-center justify-between gap-2"
+              >
+                <span className="font-mono text-xs text-slate-600">
+                  {endpoint.label}
+                </span>
                 <Segmented
                   name={`outcome-${endpoint.key}`}
                   label={endpoint.label}
                   value={settings.outcomes[endpoint.key]}
                   options={OUTCOME_OPTIONS}
-                  onChange={(outcome) => setEndpointOutcome(endpoint.key, outcome)}
+                  onChange={(outcome) =>
+                    setEndpointOutcome(endpoint.key, outcome)
+                  }
                 />
               </div>
             ))}
           </div>
-          <p className="mt-2 text-xs text-slate-500">"Fail once" fails the next call, then switches back to success.</p>
+          <p className="mt-2 text-xs text-slate-500">
+            "Fail once" fails the next call, then switches back to success.
+          </p>
         </fieldset>
 
         <fieldset>
@@ -119,11 +139,14 @@ function MockAdminPanel({ onClose }: { onClose: () => void }) {
             label="Refund total check"
             value={settings.refundTotalCheck}
             options={TOTAL_CHECK_OPTIONS}
-            onChange={(refundTotalCheck) => updateMockSettings({ refundTotalCheck })}
+            onChange={(refundTotalCheck) =>
+              updateMockSettings({ refundTotalCheck })
+            }
           />
           <p className="mt-1 text-xs text-slate-500">
-            On mismatch, the server's total comes out RM 1.00 higher than the reviewed one, so the refund is rejected
-            with a 409 before anything is refunded.
+            On mismatch, the server's total comes out RM 1.00 higher than the
+            reviewed one, so the refund is rejected with a 409 before anything
+            is refunded.
           </p>
         </fieldset>
       </div>
@@ -147,7 +170,11 @@ function Segmented<T extends string>({
   onChange: (value: T) => void;
 }) {
   return (
-    <div role="radiogroup" aria-label={label} className="inline-flex rounded-lg border border-slate-200 bg-slate-100 p-0.5">
+    <div
+      role="radiogroup"
+      aria-label={label}
+      className="inline-flex rounded-lg border border-slate-200 bg-slate-100 p-0.5"
+    >
       {options.map((option) => (
         <label
           key={option.value}

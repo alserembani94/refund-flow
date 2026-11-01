@@ -18,9 +18,9 @@ function App() {
     const id = crypto.randomUUID();
     setToasts((current) => [...current, { ...toast, id }]);
   };
-  const dismissToast = (id: string) => setToasts((current) => current.filter((toast) => toast.id !== id));
+  const dismissToast = (id: string) =>
+    setToasts((current) => current.filter((toast) => toast.id !== id));
 
-  // A total mismatch never reaches here: the server rejects it with a 409 before refunding.
   const handleRefunded = (result: CreateRefundResponse) => {
     setOpenOrderId(null);
     orders.reload();
@@ -36,16 +36,24 @@ function App() {
       <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
         <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold tracking-wider text-slate-500 uppercase">Internal · Support</p>
+            <p className="text-xs font-semibold tracking-wider text-slate-500 uppercase">
+              Internal · Support
+            </p>
             <h1 className="text-2xl font-semibold">Orders</h1>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {orders.isRefetching && (
-              <span role="status" className="flex items-center gap-1.5 text-sm text-slate-500">
+              <span
+                role="status"
+                className="flex items-center gap-1.5 text-sm text-slate-500"
+              >
                 <Spinner /> Refreshing…
               </span>
             )}
-            <Button onClick={orders.reload} disabled={orders.isLoading || orders.isRefetching}>
+            <Button
+              onClick={orders.reload}
+              disabled={orders.isLoading || orders.isRefetching}
+            >
               Refresh
             </Button>
           </div>

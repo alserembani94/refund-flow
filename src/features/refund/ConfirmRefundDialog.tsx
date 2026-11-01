@@ -23,7 +23,6 @@ type ConfirmRefundDialogProps = {
   currency: Currency;
   onCancel: () => void;
   onSuccess: (result: CreateRefundResponse) => void;
-  /** For errors that resending won't fix: close this dialog and refetch the order. */
   onReloadOrder: () => void;
 };
 

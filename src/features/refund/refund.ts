@@ -64,7 +64,6 @@ export function hasRefundableItems(order: Order) {
   );
 }
 
-/** Drops anything no longer refundable, e.g. after a reload shows someone else refunded it. */
 export function getRefundableSelection(
   order: Order,
   unitIds: ReadonlySet<string>,
@@ -122,7 +121,6 @@ export function validateRefundForm(values: RefundFormValues): RefundFormErrors {
 
 export type RefundDraft = Omit<CreateRefundRequest, "refund_request_key">;
 
-/** Returns null until the form has everything the API needs. */
 export function toRefundDraft(
   order: Order,
   unitIds: ReadonlySet<string>,

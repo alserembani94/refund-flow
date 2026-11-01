@@ -158,7 +158,7 @@ The refund calculation happens both on FE and BE.
   - **Out-of-date order**. The order may have been refunded by someone else in the server.
   - **Different rules**. The server may apply certain rules on the calculation, and this may need fix on FE to make sure that the calculations tally. e.g. added tax, rounding cents rules
 
-## Assumptions & Key decisions
+## Assumptions
 
 Few assumptions have been made throughout the development
 - In the original assignment, the order has `status`. Since there is a rule where full refund applies when staff selects all items in the order, the `status` for order will only be changed when all items in the order has been refunded - staff can still select an order that is not refunded fully, and select other items that has not been refunded.
@@ -173,13 +173,20 @@ Related to dev-only processes:
 - In the assignment, there is a line mentioned regarding the API - `Your mock
 should behave like a real API, which means responses can be slow and can fail.`. I decided to add an admin panel - in which can only be accessed in developer mode. In developer mode, look into your bottom left of the screen to access the admin panel and simulate certain conditions for each API. The code is split, so that it won't be bundled and ported to the production.
 
+## Key decisions
+
 Decisions that I've made:
 - Refund to have split between refund draft and the real refund - this is to ensure that the calculations, status and the processes for refund is tally between FE and BE. `refund_request_key` is an temporary idempotent key, as this only checks for that refund session, so it refers to the existing refund draft the next time it recalculates.
 - Adding staff info and timestamp for the audit trail. While there is no interface to get this info, this data can be retrieved later for further use.
 - Admin panel are added to assist developer in simulating few conditions. In real development, the request network speed can be tested by throttling in the browser. The error is instead is useful, made to match the contract between BE and FE, so FE can spend some time to handle errors on FE, while BE can finish up their work to fulfil the contract.
+- As for code architecture:
+  - I've splitted between `/api` and `/mocks` that represent 2 distinct features - `/api` should always be in the project (I may be able to add Tanstack Query in the future), and `/mocks` represents how BE works and serve as a contract.
+  - I've also have `/tests` to hold all test suites. This enabled the developer to go through the test cases, find any flaky tests, or create a new one.
+- I installed important libraries enough for my operations. I would love to add more dependencies such as Radix, TanStack Query, Zustand and so on, but those will only add complexity to the project for now. If this happens to grow, then I may install these dependencies to fulfil matched requirements.
 
 ## Known limitations & Next Steps
 - It is known that there is no API to be called, and all of API calls are mocked instead. This is not simulating the real behavior of the BE, but the current mock is enough to simulate most BE responses.
 - As the contracts has been established, the next step should be integrating to the real BE. Since all the error handling, the golden paths has been completed, the integrations should be seamless. All the bugs found after the integrations will be patched later on.
 - There is no design spec given. While the design are assumed in this assignment, the next process could also be product acceptance, checking all designs and copyrights.
 - For a proper app flow, we may next incorporate into an app with a proper navigation and auth, so we can have a proper access control.
+- On technical side, the project is bootstrapped using Typescript 7.0. ESLint is not compatible with the TS7.0, so running the eslint is expected to fail. Given more time, I will downgrade the Typescript, as the type definitions used in this project are all backward-compatible.

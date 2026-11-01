@@ -14,7 +14,13 @@ const TONES = {
 
 const SUCCESS_TIMEOUT_MS = 6000;
 
-export function Toasts({ toasts, onDismiss }: { toasts: Toast[]; onDismiss: (id: string) => void }) {
+export function Toasts({
+  toasts,
+  onDismiss,
+}: {
+  toasts: Toast[];
+  onDismiss: (id: string) => void;
+}) {
   return (
     <div
       aria-live="polite"
@@ -27,9 +33,14 @@ export function Toasts({ toasts, onDismiss }: { toasts: Toast[]; onDismiss: (id:
   );
 }
 
-function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: (id: string) => void }) {
+function ToastItem({
+  toast,
+  onDismiss,
+}: {
+  toast: Toast;
+  onDismiss: (id: string) => void;
+}) {
   useEffect(() => {
-    // Warnings need a human to act on them, so they stay until dismissed.
     if (toast.tone !== "success") return;
     const timer = setTimeout(() => onDismiss(toast.id), SUCCESS_TIMEOUT_MS);
     return () => clearTimeout(timer);
@@ -40,10 +51,15 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: (id: string)
       role={toast.tone === "warning" ? "alert" : "status"}
       className={`pointer-events-auto flex gap-3 rounded-lg border p-4 shadow-lg ${TONES[toast.tone].box}`}
     >
-      <span className={`mt-1.5 size-2 shrink-0 rounded-full ${TONES[toast.tone].dot}`} aria-hidden="true" />
+      <span
+        className={`mt-1.5 size-2 shrink-0 rounded-full ${TONES[toast.tone].dot}`}
+        aria-hidden="true"
+      />
       <div className="min-w-0 flex-1 text-sm">
         <p className="font-medium text-slate-900">{toast.title}</p>
-        {toast.message && <p className="mt-0.5 text-slate-600">{toast.message}</p>}
+        {toast.message && (
+          <p className="mt-0.5 text-slate-600">{toast.message}</p>
+        )}
       </div>
       <button
         type="button"
