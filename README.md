@@ -4,7 +4,52 @@
 
 This is a part of the assignment to create a refund flow. The requirements are to develop a single-page app for simulating a refund flow.
 
-## API Endpoints
+---
+
+## Setting up the project
+
+The project is created using Vite. All the scripts are available in `package.json`.
+
+### Before running any scripts
+
+Make sure to install all dependencies after cloning this project to your local machine.
+
+```bash
+# Use any preferred package manager (npm, pnpm, bun). This project uses bun.
+bun install
+```
+
+### Running the project
+
+To run the project locally, you can run the script below:
+
+```bash
+bun run dev
+```
+
+After running the script, you can visit the project at `http://localhost:5173`. To terminate the dev server, just press `Ctrl + C`.
+
+### Run tests
+
+There are test suites in this project. All test suites can be found in `/tests`. To run the project, you can run the script below:
+
+```bash
+bun run test
+```
+
+You should be able to see your test runs live in the terminal. You can edit the test suites while running your tests. To terminal, simply click "q" in the terminal. `Ctrl + C` also works to terminate the tests.
+
+### Preview app
+
+While you can run the project locally, you can also visit the live version of the app here: [Preview Link](https://refund-flow-mu.vercel.app/)
+
+You can also type the link into the browser: https://refund-flow-mu.vercel.app/
+
+---
+
+## Technical Specifications
+
+### API Endpoints
 
 In general, there are 3 endpoints, in which is simulated through `/src/api`:
 
@@ -131,7 +176,7 @@ type AmountMismatchError = ErrorResponse & {
 };
 
 
-## Refund Calculations
+### Refund Calculations
 
 You can check out the calculations on both ends:
 FE: `/src/features/refund.ts`
@@ -158,7 +203,7 @@ The refund calculation happens both on FE and BE.
   - **Out-of-date order**. The order may have been refunded by someone else in the server.
   - **Different rules**. The server may apply certain rules on the calculation, and this may need fix on FE to make sure that the calculations tally. e.g. added tax, rounding cents rules
 
-## Assumptions
+### Assumptions
 
 Few assumptions have been made throughout the development
 - In the original assignment, the order has `status`. Since there is a rule where full refund applies when staff selects all items in the order, the `status` for order will only be changed when all items in the order has been refunded - staff can still select an order that is not refunded fully, and select other items that has not been refunded.
@@ -173,7 +218,7 @@ Related to dev-only processes:
 - In the assignment, there is a line mentioned regarding the API - `Your mock
 should behave like a real API, which means responses can be slow and can fail.`. I decided to add an admin panel - in which can only be accessed in developer mode. In developer mode, look into your bottom left of the screen to access the admin panel and simulate certain conditions for each API. The code is split, so that it won't be bundled and ported to the production.
 
-## Key decisions
+### Key decisions
 
 Decisions that I've made:
 - Refund to have split between refund draft and the real refund - this is to ensure that the calculations, status and the processes for refund is tally between FE and BE. `refund_request_key` is an temporary idempotent key, as this only checks for that refund session, so it refers to the existing refund draft the next time it recalculates.
@@ -184,7 +229,7 @@ Decisions that I've made:
   - I've also have `/tests` to hold all test suites. This enabled the developer to go through the test cases, find any flaky tests, or create a new one.
 - I installed important libraries enough for my operations. I would love to add more dependencies such as Radix, TanStack Query, Zustand and so on, but those will only add complexity to the project for now. If this happens to grow, then I may install these dependencies to fulfil matched requirements.
 
-## Known limitations & Next Steps
+### Known limitations & Next Steps
 - It is known that there is no API to be called, and all of API calls are mocked instead. This is not simulating the real behavior of the BE, but the current mock is enough to simulate most BE responses.
 - As the contracts has been established, the next step should be integrating to the real BE. Since all the error handling, the golden paths has been completed, the integrations should be seamless. All the bugs found after the integrations will be patched later on.
 - There is no design spec given. While the design are assumed in this assignment, the next process could also be product acceptance, checking all designs and copyrights.
