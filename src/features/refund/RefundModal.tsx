@@ -33,13 +33,16 @@ type RefundModalProps = {
   onRefunded: (result: CreateRefundResponse) => void;
 };
 
-/**
- * Order details + refund step form. All refund state lives here, so unmounting
- * (closing) discards it. Give it `key={orderId}` to reset when the order changes.
- */
-export function RefundModal({ orderId, onClose, onRefunded }: RefundModalProps) {
+export function RefundModal({
+  orderId,
+  onClose,
+  onRefunded,
+}: RefundModalProps) {
   const formId = useId();
-  const fetchOrder = useCallback((signal: AbortSignal) => getOrder(orderId, signal), [orderId]);
+  const fetchOrder = useCallback(
+    (signal: AbortSignal) => getOrder(orderId, signal),
+    [orderId],
+  );
   const { data: order, error, isLoading, reload } = useQuery(fetchOrder);
 
   const [step, setStep] = useState<Step>("select");
@@ -64,20 +67,33 @@ export function RefundModal({ orderId, onClose, onRefunded }: RefundModalProps) 
         {isLoading ? (
           <LoadingState label="Loading order…" />
         ) : (
-          <ErrorState title="Couldn't load this order." error={error} onRetry={reload} />
+          <ErrorState
+            title="Couldn't load this order."
+            error={error}
+            onRetry={reload}
+          />
         )}
       </Modal>
     );
   }
 
-  // `order` is the last loaded copy; while a reload is in flight it may be stale, so block submitting.
   const isRefreshing = isLoading;
   const selection = getRefundableSelection(order, unitIds, refundDeliveryFee);
-  const total = calculateRefundTotal(order, selection.unitIds, selection.refundDeliveryFee);
-  const hasSelection = selection.unitIds.size > 0 || selection.refundDeliveryFee;
+  const total = calculateRefundTotal(
+    order,
+    selection.unitIds,
+    selection.refundDeliveryFee,
+  );
+  const hasSelection =
+    selection.unitIds.size > 0 || selection.refundDeliveryFee;
   const activeStep: Step = hasSelection ? step : "select";
   const errors = validateRefundForm(form);
-  const draft = toRefundDraft(order, selection.unitIds, selection.refundDeliveryFee, form);
+  const draft = toRefundDraft(
+    order,
+    selection.unitIds,
+    selection.refundDeliveryFee,
+    form,
+  );
   const deliveryFeeRefundable = canRefundDeliveryFee(order);
 
   const handleReviewSubmit = () => {
@@ -109,14 +125,24 @@ export function RefundModal({ orderId, onClose, onRefunded }: RefundModalProps) 
             onChange={(event) => setRefundDeliveryFee(event.target.checked)}
             className="size-4 accent-slate-900"
           />
-          Refund delivery fee ({formatMoney(order.delivery_fee, order.currency)})
-          {order.delivery_fee_status === "refunded" && <span>· already refunded</span>}
+          Refund delivery fee ({formatMoney(order.delivery_fee, order.currency)}
+          )
+          {order.delivery_fee_status === "refunded" && (
+            <span>· already refunded</span>
+          )}
         </label>
         <div className="flex items-center gap-4">
           <span className="text-sm text-slate-500">
-            Total <strong className="text-slate-900 tabular-nums">{formatMoney(total, order.currency)}</strong>
+            Total{" "}
+            <strong className="text-slate-900 tabular-nums">
+              {formatMoney(total, order.currency)}
+            </strong>
           </span>
-          <Button variant="primary" disabled={!hasSelection || isRefreshing} onClick={() => setStep("review")}>
+          <Button
+            variant="primary"
+            disabled={!hasSelection || isRefreshing}
+            onClick={() => setStep("review")}
+          >
             Next
           </Button>
         </div>
@@ -124,7 +150,12 @@ export function RefundModal({ orderId, onClose, onRefunded }: RefundModalProps) 
     ) : (
       <div className="flex justify-between gap-3">
         <Button onClick={() => setStep("select")}>Back</Button>
-        <Button variant="primary" type="submit" form={formId} disabled={isRefreshing}>
+        <Button
+          variant="primary"
+          type="submit"
+          form={formId}
+          disabled={isRefreshing}
+        >
           Confirm
         </Button>
       </div>
@@ -132,12 +163,25 @@ export function RefundModal({ orderId, onClose, onRefunded }: RefundModalProps) 
 
   return (
     <>
-      <Modal title={`Order ${orderId}`} description={STEP_LABELS[activeStep]} onClose={onClose} footer={footer}>
+      <Modal
+        title={`Order ${orderId}`}
+        description={STEP_LABELS[activeStep]}
+        onClose={onClose}
+        footer={footer}
+      >
         {wasReloaded && (
-          <ReloadNotice isRefreshing={isRefreshing} error={isRefreshing ? undefined : error} onRetry={reload} />
+          <ReloadNotice
+            isRefreshing={isRefreshing}
+            error={isRefreshing ? undefined : error}
+            onRetry={reload}
+          />
         )}
         {activeStep === "select" ? (
-          <SelectStep order={order} selectedUnitIds={selection.unitIds} onToggleUnit={toggleUnit} />
+          <SelectStep
+            order={order}
+            selectedUnitIds={selection.unitIds}
+            onToggleUnit={toggleUnit}
+          />
         ) : (
           <ReviewStep
             order={order}
@@ -146,7 +190,9 @@ export function RefundModal({ orderId, onClose, onRefunded }: RefundModalProps) 
             total={total}
             values={form}
             errors={showErrors ? errors : {}}
-            onChange={(patch) => setForm((current) => ({ ...current, ...patch }))}
+            onChange={(patch) =>
+              setForm((current) => ({ ...current, ...patch }))
+            }
             formId={formId}
             onSubmit={handleReviewSubmit}
           />
@@ -166,27 +212,49 @@ export function RefundModal({ orderId, onClose, onRefunded }: RefundModalProps) 
   );
 }
 
-function ReloadNotice({ isRefreshing, error, onRetry }: { isRefreshing: boolean; error?: Error; onRetry: () => void }) {
+function ReloadNotice({
+  isRefreshing,
+  error,
+  onRetry,
+}: {
+  isRefreshing: boolean;
+  error?: Error;
+  onRetry: () => void;
+}) {
   if (isRefreshing) {
     return (
-      <p role="status" className="mb-4 flex items-center gap-2 rounded-lg bg-slate-50 p-3 text-sm text-slate-600">
+      <p
+        role="status"
+        className="mb-4 flex items-center gap-2 rounded-lg bg-slate-50 p-3 text-sm text-slate-600"
+      >
         <Spinner /> Reloading the latest order…
       </p>
     );
   }
   if (error) {
     return (
-      <div role="alert" className="mb-4 flex items-center justify-between gap-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+      <div
+        role="alert"
+        className="mb-4 flex items-center justify-between gap-4 rounded-lg bg-red-50 p-3 text-sm text-red-700"
+      >
         <span>Couldn't reload the order. {error.message}</span>
-        <button type="button" onClick={onRetry} className="font-medium underline">
+        <button
+          type="button"
+          onClick={onRetry}
+          className="font-medium underline"
+        >
           Retry
         </button>
       </div>
     );
   }
   return (
-    <p role="status" className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
-      Loaded the latest version of this order. Check the items and total before confirming again.
+    <p
+      role="status"
+      className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900"
+    >
+      Loaded the latest version of this order. Check the items and total before
+      confirming again.
     </p>
   );
 }

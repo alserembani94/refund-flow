@@ -1,7 +1,14 @@
 import { sumMoney } from "../../lib/money";
-import type { Addon, CreateRefundRequest, Line, Order, RefundChannel, RefundReason, Unit } from "../../types";
+import type {
+  Addon,
+  CreateRefundRequest,
+  Line,
+  Order,
+  RefundChannel,
+  RefundReason,
+  Unit,
+} from "../../types";
 
-// Placeholder until the console has real staff auth.
 export const CURRENT_STAFF_ID = "STF-001";
 
 export const REASON_LABELS: Record<RefundReason, string> = {
@@ -21,7 +28,6 @@ export type UnitEntry = {
   line: Line;
   unit: Unit;
   label: string;
-  /** Addons still paid — these are refunded together with their unit. */
   paidAddons: Addon[];
   amount: number;
 };
@@ -33,9 +39,15 @@ export function getUnitEntries(order: Order): UnitEntry[] {
       return {
         line,
         unit,
-        label: line.units.length > 1 ? `${line.name} (${index + 1} of ${line.units.length})` : line.name,
+        label:
+          line.units.length > 1
+            ? `${line.name} (${index + 1} of ${line.units.length})`
+            : line.name,
         paidAddons,
-        amount: sumMoney([line.unit_price, ...paidAddons.map((addon) => addon.unit_price)]),
+        amount: sumMoney([
+          line.unit_price,
+          ...paidAddons.map((addon) => addon.unit_price),
+        ]),
       };
     }),
   );
@@ -46,11 +58,18 @@ export function canRefundDeliveryFee(order: Order) {
 }
 
 export function hasRefundableItems(order: Order) {
-  return canRefundDeliveryFee(order) || getUnitEntries(order).some(({ unit }) => unit.status === "paid");
+  return (
+    canRefundDeliveryFee(order) ||
+    getUnitEntries(order).some(({ unit }) => unit.status === "paid")
+  );
 }
 
 /** Drops anything no longer refundable, e.g. after a reload shows someone else refunded it. */
-export function getRefundableSelection(order: Order, unitIds: ReadonlySet<string>, refundDeliveryFee: boolean) {
+export function getRefundableSelection(
+  order: Order,
+  unitIds: ReadonlySet<string>,
+  refundDeliveryFee: boolean,
+) {
   const paidUnitIds = new Set(
     getUnitEntries(order)
       .filter(({ unit }) => unit.status === "paid")
@@ -62,9 +81,18 @@ export function getRefundableSelection(order: Order, unitIds: ReadonlySet<string
   };
 }
 
-export function calculateRefundTotal(order: Order, unitIds: ReadonlySet<string>, refundDeliveryFee: boolean) {
-  const units = getUnitEntries(order).filter(({ unit }) => unitIds.has(unit.unit_id));
-  return sumMoney([...units.map((entry) => entry.amount), refundDeliveryFee ? order.delivery_fee : 0]);
+export function calculateRefundTotal(
+  order: Order,
+  unitIds: ReadonlySet<string>,
+  refundDeliveryFee: boolean,
+) {
+  const units = getUnitEntries(order).filter(({ unit }) =>
+    unitIds.has(unit.unit_id),
+  );
+  return sumMoney([
+    ...units.map((entry) => entry.amount),
+    refundDeliveryFee ? order.delivery_fee : 0,
+  ]);
 }
 
 export type RefundFormValues = {
@@ -75,14 +103,19 @@ export type RefundFormValues = {
 
 export type RefundFormErrors = Partial<Record<keyof RefundFormValues, string>>;
 
-export const EMPTY_REFUND_FORM: RefundFormValues = { reason: "", otherReason: "", channel: "" };
+export const EMPTY_REFUND_FORM: RefundFormValues = {
+  reason: "",
+  otherReason: "",
+  channel: "",
+};
 
 export const OTHER_REASON_MAX_LENGTH = 500;
 
 export function validateRefundForm(values: RefundFormValues): RefundFormErrors {
   const errors: RefundFormErrors = {};
   if (!values.reason) errors.reason = "Select a reason.";
-  else if (values.reason === "other" && !values.otherReason.trim()) errors.otherReason = "Describe the reason.";
+  else if (values.reason === "other" && !values.otherReason.trim())
+    errors.otherReason = "Describe the reason.";
   if (!values.channel) errors.channel = "Select a refund channel.";
   return errors;
 }

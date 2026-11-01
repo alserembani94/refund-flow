@@ -10,11 +10,6 @@ type Settled<T> = {
   error?: Error;
 };
 
-/**
- * Minimal data-fetching hook. `fetcher` must be referentially stable (a module
- * function or a useCallback); changing it or calling `reload` refetches.
- * `data` keeps the last successful result while a refetch is in flight.
- */
 export function useQuery<T>(fetcher: Fetcher<T>) {
   const [attempt, setAttempt] = useState(0);
   const [settled, setSettled] = useState<Settled<T> | null>(null);
@@ -27,7 +22,12 @@ export function useQuery<T>(fetcher: Fetcher<T>) {
       },
       (error: unknown) => {
         if (!controller.signal.aborted) {
-          setSettled((previous) => ({ fetcher, attempt, data: previous?.data, error: toError(error) }));
+          setSettled((previous) => ({
+            fetcher,
+            attempt,
+            data: previous?.data,
+            error: toError(error),
+          }));
         }
       },
     );
