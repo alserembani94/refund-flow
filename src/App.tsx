@@ -40,12 +40,12 @@ function App() {
             <h1 className="text-2xl font-semibold">Orders</h1>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            {orders.isLoading && orders.data && (
+            {orders.isRefetching && (
               <span role="status" className="flex items-center gap-1.5 text-sm text-slate-500">
                 <Spinner /> Refreshing…
               </span>
             )}
-            <Button onClick={orders.reload} disabled={orders.isLoading}>
+            <Button onClick={orders.reload} disabled={orders.isLoading || orders.isRefetching}>
               Refresh
             </Button>
           </div>

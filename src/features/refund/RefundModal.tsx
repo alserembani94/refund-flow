@@ -43,7 +43,8 @@ export function RefundModal({
     (signal: AbortSignal) => getOrder(orderId, signal),
     [orderId],
   );
-  const { data: order, error, isLoading, reload } = useQuery(fetchOrder);
+  const { data: order, error, isLoading, isRefetching, reload } =
+    useQuery(fetchOrder);
 
   const [step, setStep] = useState<Step>("select");
   const [unitIds, setUnitIds] = useState<ReadonlySet<string>>(new Set());
@@ -77,7 +78,6 @@ export function RefundModal({
     );
   }
 
-  const isRefreshing = isLoading;
   const selection = getRefundableSelection(order, unitIds, refundDeliveryFee);
   const total = calculateRefundTotal(
     order,
@@ -97,7 +97,7 @@ export function RefundModal({
   const deliveryFeeRefundable = canRefundDeliveryFee(order);
 
   const handleReviewSubmit = () => {
-    if (isRefreshing) return;
+    if (isRefetching) return;
     if (!draft) {
       setShowErrors(true);
       return;
@@ -140,7 +140,7 @@ export function RefundModal({
           </span>
           <Button
             variant="primary"
-            disabled={!hasSelection || isRefreshing}
+            disabled={!hasSelection || isRefetching}
             onClick={() => setStep("review")}
           >
             Next
@@ -154,7 +154,7 @@ export function RefundModal({
           variant="primary"
           type="submit"
           form={formId}
-          disabled={isRefreshing}
+          disabled={isRefetching}
         >
           Confirm
         </Button>
@@ -171,8 +171,8 @@ export function RefundModal({
       >
         {wasReloaded && (
           <ReloadNotice
-            isRefreshing={isRefreshing}
-            error={isRefreshing ? undefined : error}
+            isRefetching={isRefetching}
+            error={error}
             onRetry={reload}
           />
         )}
@@ -213,15 +213,15 @@ export function RefundModal({
 }
 
 function ReloadNotice({
-  isRefreshing,
+  isRefetching,
   error,
   onRetry,
 }: {
-  isRefreshing: boolean;
+  isRefetching: boolean;
   error?: Error;
   onRetry: () => void;
 }) {
-  if (isRefreshing) {
+  if (isRefetching) {
     return (
       <p
         role="status"

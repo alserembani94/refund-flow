@@ -23,7 +23,7 @@ export function OrdersTable({ orders, isLoading, error, onRetry, onOpenOrder }: 
 
   return (
     <>
-      {error && !isLoading && (
+      {error && (
         <div
           role="alert"
           className="flex items-center justify-between gap-4 border-b border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700"

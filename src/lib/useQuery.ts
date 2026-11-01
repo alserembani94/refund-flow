@@ -34,10 +34,15 @@ export function useQuery<T>(fetcher: Fetcher<T>) {
     return () => controller.abort();
   }, [fetcher, attempt]);
 
+  const isFetching =
+    settled?.fetcher !== fetcher || settled.attempt !== attempt;
+  const data = settled?.data;
+
   return {
-    data: settled?.data,
-    error: settled?.error,
-    isLoading: settled?.fetcher !== fetcher || settled.attempt !== attempt,
+    data,
+    error: isFetching ? undefined : settled?.error,
+    isLoading: isFetching && data === undefined,
+    isRefetching: isFetching && data !== undefined,
     reload: () => setAttempt((current) => current + 1),
   };
 }
