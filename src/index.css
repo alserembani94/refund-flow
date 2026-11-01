@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+/* Native <dialog> doesn't lock page scroll on its own. */
+html:has(dialog[open]) {
+  overflow: hidden;
+}
